@@ -1,0 +1,24 @@
+[project]
+name = "busec-web-backend"
+version = "0.1.0"
+description = ""
+authors = [
+    { name = "Daniel Onuchukwu", email = "114066984+0xfelaback@users.noreply.github.com" },
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["django (>=6.1.2,<7.0.0)", "djangorestframework (>=3.18.3,<4.0.0)", "drf-spectacular (>=0.30.0,<0.31.0)", "psycopg[binary] (>=3.3.6,<4.0.0)", "dj-database-url (>=3.1.2,<4.0.0)", "python-dotenv (>=1.2.4,<2.0.0)"]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
+
+[dependency-groups]
+dev = [
+    "pydantic (>=2.14.2,<3.0.0)",
+    "pydantic-settings (>=2.16.2,<3.0.0)"
+]
