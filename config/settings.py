@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "features.accounts",
     "features.todos",
 ]
 
@@ -82,6 +83,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": dj_database_url.parse(settings.DATABASE_CONNECTION_STRING),
 }
+
+
+AUTH_USER_MODEL = "accounts.User"
 
 
 # Password validation
