@@ -1,12 +1,8 @@
 from django.contrib import admin
-from django.http import JsonResponse
 from django.urls import URLPattern, URLResolver, include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-
-def health(request):
-    return JsonResponse({"status": "ok"})
-
+from shared.views import health
 
 urlpatterns: list[URLResolver | URLPattern] = [
     path("admin/", admin.site.urls),

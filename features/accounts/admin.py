@@ -7,4 +7,5 @@ from features.accounts.models import User
 class StaffUserAdmin(UserAdmin):
     list_display = ("username", "email", "role", "is_active")
     list_filter = ("role", "is_active")
-    fieldsets = UserAdmin.fieldsets + (("Role", {"fields": ("role",)}),)
+    # UserAdmin.fieldsets is typed as optional, so unpack it instead of using "+".
+    fieldsets = (*(UserAdmin.fieldsets or ()), ("Role", {"fields": ("role",)}))
