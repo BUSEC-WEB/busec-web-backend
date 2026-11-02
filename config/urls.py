@@ -5,7 +5,6 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 
 def health(request):
-    """For uptime monitoring (PRD §6)."""
     return JsonResponse({"status": "ok"})
 
 

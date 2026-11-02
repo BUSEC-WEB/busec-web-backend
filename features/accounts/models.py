@@ -3,11 +3,13 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """Staff account. Readers don't sign in, so every user is staff (PRD §3)."""
+    """Staff account. Readers don't sign in, so every user is staff."""
 
     class Role(models.TextChoices):
         JOURNALIST = "journalist"
         EXECUTIVE = "executive"
-        SITE_ADMIN = "site_admin"
+        SITE_ADMIN = "site_admin"  # is_staff = True, only for site admins.
 
-    role = models.CharField(max_length=20, choices=Role.choices, default=Role.JOURNALIST)
+    role = models.CharField(
+        max_length=20, choices=Role.choices, default=Role.JOURNALIST
+    )
