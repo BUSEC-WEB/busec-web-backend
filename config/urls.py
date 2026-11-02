@@ -19,4 +19,5 @@ urlpatterns: list[URLResolver | URLPattern] = [
         name="swagger-ui",
     ),
     # Each feature slice registers its own routes here.
+    path("api/accounts/", include("features.accounts.urls")),
 ]
