@@ -10,19 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
-import os
 from pathlib import Path
+from typing import Any
 
 import dj_database_url
-from dotenv import load_dotenv
-from typing import Any
+
 from shared.env import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-load_dotenv(BASE_DIR / ".env")
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -31,9 +27,9 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = settings.DEBUG.lower() == "true"
+DEBUG = settings.DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 
 # Application definition
@@ -84,7 +80,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.parse(os.environ["DATABASE_CONNECTION_STRING"]),
+    "default": dj_database_url.parse(settings.DATABASE_CONNECTION_STRING),
 }
 
 

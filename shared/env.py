@@ -3,7 +3,8 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_DIR = Path(__file__).resolve().parents[3]
+# shared/env.py -> repo root
+ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
@@ -17,9 +18,12 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    DATABASE_URL: str = Field(default=...)
-    DEBUG: str = Field(default=...)
+    DATABASE_CONNECTION_STRING: str = Field(default=...)
+    DEBUG: bool = Field(default=...)
     SECRET_KEY: str = Field(default=...)
+    # JSON lists in .env, e.g. ALLOWED_HOSTS=["api.busec.online"]
+    ALLOWED_HOSTS: list[str] = []
+    CORS_ALLOWED_ORIGINS: list[str] = []
 
 
 settings = Settings()
