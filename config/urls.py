@@ -20,4 +20,8 @@ urlpatterns: list[URLResolver | URLPattern] = [
     ),
     # Each feature slice registers its own routes here.
     path("api/accounts/", include("features.accounts.urls")),
+    path("api/content/", include("features.content.urls")),
+    path("api/magazine/", include("features.magazine.urls")),
+    path("api/committee/", include("features.committee.urls")),
+    path("api/newsletter/", include("features.newsletter.urls")),
 ]

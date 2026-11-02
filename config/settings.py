@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "features.accounts",
+    "features.content",
+    "features.magazine",
+    "features.committee",
+    "features.newsletter",
 ]
 
 MIDDLEWARE = [
