@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-from shared.views import health
+from shared.views import HealthView
 
 urlpatterns: list[URLResolver | URLPattern] = [
     path("admin/", admin.site.urls),
-    path("api/health/", health, name="health"),
+    path("api/health/", HealthView.as_view(), name="health"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/docs/",
