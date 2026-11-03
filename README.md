@@ -12,14 +12,14 @@ poetry run python manage.py createsuperuser
 poetry run python manage.py runserver
 ```
 
-- Swagger UI: http://127.0.0.1:8000/api/docs/
-- Admin: http://127.0.0.1:8000/admin/
-- Health check: http://127.0.0.1:8000/api/health/
+- Swagger UI: <http://127.0.0.1:8000/api/docs/>
+- Admin: <http://127.0.0.1:8000/admin/>
+- Health check: <http://127.0.0.1:8000/api/health/>
 - Tests: `poetry run python manage.py test`
 
 ## Layout
 
-```
+``` text
 config/         settings and root urls
 shared/env.py   reads and validates .env (add new env keys here)
 features/
