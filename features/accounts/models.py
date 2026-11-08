@@ -10,6 +10,6 @@ class User(AbstractUser):
         EXECUTIVE = "executive"
         SITE_ADMIN = "site_admin"  # is_staff = True, only for site admins.
 
-    role = models.CharField(
+    role: "models.CharField[str, str]" = models.CharField(
         max_length=20, choices=Role.choices, default=Role.JOURNALIST
     )
