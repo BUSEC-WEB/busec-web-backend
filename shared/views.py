@@ -28,8 +28,8 @@ def _check_database() -> str:
 class HealthView(APIView):
     """For uptime monitoring (PRD §6). Returns 503 if any integration is down."""
 
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = ()
+    permission_classes = ()
 
     @extend_schema(
         tags=["health"],

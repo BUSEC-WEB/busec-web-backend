@@ -361,6 +361,29 @@ files = [
 django = ">=5.2"
 
 [[package]]
+name = "djangorestframework-stubs"
+version = "3.18.2"
+description = "PEP-484 stubs for django-rest-framework"
+optional = false
+python-versions = ">=3.11"
+groups = ["dev"]
+files = [
+    {file = "djangorestframework_stubs-3.18.2-py3-none-any.whl", hash = "sha256:fb4bffc3037063535390fd2cfde11f81c182e05949220d4742ffc0485218972c"},
+    {file = "djangorestframework_stubs-3.18.2.tar.gz", hash = "sha256:a8e009eee5e7c78c0a0a28cc69875bd1a44bde5499de085e52461479dc9522b1"},
+]
+
+[package.dependencies]
+django-stubs = ">=6.1.2"
+types-pyyaml = "*"
+typing-extensions = ">=4.0"
+
+[package.extras]
+compatible-mypy = ["django-stubs[compatible-mypy]", "mypy (>=1.13,<2.5)"]
+coreapi = ["coreapi (>=2.0.0)"]
+markdown = ["types-markdown (>=0.1.5)"]
+requests = ["types-requests"]
+
+[[package]]
 name = "drf-spectacular"
 version = "0.30.0"
 description = "Sane and flexible OpenAPI 3 schema generation for Django REST framework"
@@ -1356,4 +1379,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "e39baacc5ec148089c842f56adf44678540fd0982d7a02f5ae77ca71b37c4e2b"
+content-hash = "9c693fa5e228cb5c9dc35a8beb179aa5d6fb19ca72981bd2706aa43b00594a6d"

@@ -15,6 +15,9 @@ concurrency:
 
 env:
   PYTHON_VERSION: "3.12"
+  DATABASE_CONNECTION_STRING: postgresql://developer:AH1W4MYUWxQ9xBXu@localhost:5432/postgres
+  DEBUG: True
+  SECRET_KEY: 2f7784f9ecbb658c1c85cd7a674ee08891f722e9079cac8d364001c0a2c702ca424a43922fbd3c3b2612d4e5d91ec69b3180860473a1eab9ec212fc2ae809a1a
 
 jobs:
   static-analysis:
@@ -72,6 +75,9 @@ jobs:
       POSTGRES_PASSWORD: AH1W4MYUWxQ9xBXu
       POSTGRES_DB: postgres
       POSTGRES_HOSTNAME: localhost
+      DATABASE_CONNECTION_STRING: postgresql://developer:AH1W4MYUWxQ9xBXu@localhost:5432/postgres
+      DEBUG: True
+      SECRET_KEY: 2f7784f9ecbb658c1c85cd7a674ee08891f722e9079cac8d364001c0a2c702ca424a43922fbd3c3b2612d4e5d91ec69b3180860473a1eab9ec212fc2ae809a1a
 
     steps:
       - name: Check out repository
