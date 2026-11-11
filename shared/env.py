@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     DATABASE_CONNECTION_STRING: str = Field(default=...)
     DEBUG: bool = Field(default=...)
     SECRET_KEY: str = Field(default=...)
+    SECURE_MODE: bool = False
     ALLOWED_HOSTS: list[str] = []
     CORS_ALLOWED_ORIGINS: list[str] = []
 

@@ -154,3 +154,19 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "BUSEC Web API",
     "VERSION": "0.1.0",
 }
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10mb
+
+
+# Production security
+# https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+
+if settings.SECURE_MODE:
+    # TLS is terminated by the proxy, which forwards the original scheme.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
