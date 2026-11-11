@@ -11,3 +11,4 @@ Never edit tests, CI config, AGENTS.md or merged migrations.
 Never “fix” a failing test by changing the assertion. Report the failure instead.
 No destructive commands (rm -rf, git reset --hard, git push --force, DROP TABLE) and no --no-verify.
 Reference the PRD of the application at 'BUSEC Blog PRD.md' and focus on the backend aspects in the document.
+Don't invent concepts in this codebase, ask if anything is vague, unclear, requires predefined code/config so I give decisions on how to go about things.

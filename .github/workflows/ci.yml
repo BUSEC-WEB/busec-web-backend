@@ -4,7 +4,7 @@ on:
   push:
     branches: ["development", "dev-onuchukwu"] # 'main' branch will need to included back later on.
   pull_request:
-    branches: ["development", "dev-onuchukwu"]
+    branches: ["development", "dev-onuchukwu"] # 'main' branch will need to included back later on.
 
 permissions:
   contents: read
