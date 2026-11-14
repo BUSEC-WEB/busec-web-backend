@@ -1,4 +1,4 @@
-.PHONY: run test coverage pytest lint migrate
+.PHONY: run test coverage pytest lint migrate seed
 
 run:
 	poetry run python manage.py runserver
@@ -22,3 +22,7 @@ lint:
 
 migrate:
 	poetry run python manage.py migrate
+
+# Dev only - Usage: make seed PASSWORD=<test users' password>
+seed:
+	poetry run python manage.py seed --password "$(PASSWORD)"

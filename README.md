@@ -73,7 +73,17 @@ Each slice has `models.py`, `serializers.py`, `views.py` and `urls.py`. The PRD 
 
 1. Write the model in `models.py`, then run `makemigrations <slice>` and `migrate`.
 2. Write the serializer, then the view (`viewsets.ModelViewSet` covers CRUD).
-3. Register routes in the slice's `urls.py`. It's already mounted at `/api/<slice>/`.
+3. Register viewsets on the `router` in the slice's `urls.py`. It's already mounted at `/api/v1/<slice>/`.
 4. Add tests in `features/<slice>/tests.py` and check the endpoint in Swagger.
 
-Defaults already set in `config/settings.py`: pagination (20 per page), filtering with `filterset_fields`, CORS origins from `.env`, and a `newsletter` throttle rate (use `throttle_scope = "newsletter"`).
+Defaults already set in `config/settings.py`: JWT auth, every endpoint requires login unless the view sets `permission_classes = [AllowAny]` (public reader endpoints), pagination (`shared.pagination.StandardPagination`, 20 per page, `?page_size=` up to 100), filtering with `filterset_fields`, CORS origins from `.env`, and a `newsletter` throttle rate (use `throttle_scope = "newsletter"`).
+
+Building blocks in `shared/`:
+
+- `models.py`: `TimeStampedModel`, `SoftDeleteModel` (`objects` hides deleted rows, `all_objects` sees all, `soft_delete()` / `restore()`).
+- `permissions.py`: `IsExecutive`, `IsJournalistOrExecutive`, `IsAuthorOrExecutive`.
+- `exceptions.py`: raise `InvalidTransition(current, target)` for a refused status change (returns 409). Every error uses one format: `{"type", "title", "status", "errors"}` (`application/problem+json`).
+
+Auth (`/api/v1/accounts/`): `login/`, `refresh/`, `logout/` (blacklists the refresh token), `me/`. Send `Authorization: Bearer <access>`.
+
+Dev data: `make seed PASSWORD=<pw>` creates `test_executive` / `test_journalist` and sample posts (DEBUG only).
