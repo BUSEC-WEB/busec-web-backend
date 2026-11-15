@@ -1,13 +1,15 @@
+from collections.abc import Callable
 from io import StringIO
 from typing import Any
 
+import pytest
 from django.contrib.auth import authenticate
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework.response import Response
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 
 from features.accounts.models import User
 from shared.exceptions import PROBLEM_CONTENT_TYPE
@@ -220,3 +222,27 @@ class CreateTestUsersCommandTests(TestCase):
             self.run_command()
 
         self.assertFalse(User.objects.exists())
+
+
+# API permission sample (pytest style): This pattern is to be copied for slice endpoints.
+# Fixtures come from the root conftest.py.
+
+
+def test_me_rejects_anonymous_readers(api_client: APIClient) -> None:
+    response = api_client.get(ME_URL)
+
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize("role", ["journalist", "executive"])
+def test_me_is_open_to_staff(
+    role: str,
+    request: pytest.FixtureRequest,
+    auth_client: Callable[[User], APIClient],
+) -> None:
+    user: User = request.getfixturevalue(role)
+
+    response = auth_client(user).get(ME_URL)
+
+    assert response.status_code == 200
+    assert response.data["role"] == role

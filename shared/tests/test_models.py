@@ -5,13 +5,14 @@ from datetime import timedelta
 from django.test import TestCase
 from django.utils import timezone
 
+from features.accounts.factories import JournalistFactory
+from features.content.factories import PostFactory
 from features.content.models import Post
-from shared.tests.factories import make_post, make_user
 
 
 class TimeStampedModelTests(TestCase):
     def setUp(self) -> None:
-        self.post = make_post(make_user("author"))
+        self.post = PostFactory.create()
 
     def test_sets_both_timestamps_on_create(self) -> None:
         self.assertIsNotNone(self.post.created_at)
@@ -40,8 +41,8 @@ class TimeStampedModelTests(TestCase):
 
 class SoftDeleteModelTests(TestCase):
     def setUp(self) -> None:
-        self.author = make_user("author")
-        self.post = make_post(self.author)
+        self.author = JournalistFactory.create()
+        self.post = PostFactory.create(author=self.author)
 
     def test_new_rows_are_not_deleted(self) -> None:
         self.assertFalse(self.post.is_deleted)
@@ -98,7 +99,7 @@ class SoftDeleteModelTests(TestCase):
         self.assertTrue(Post.objects.filter(pk=self.post.pk).exists())
 
     def test_all_objects_can_filter_by_state(self) -> None:
-        deleted = make_post(self.author, title="Deleted")
+        deleted = PostFactory.create(author=self.author)
         deleted.soft_delete()
 
         self.assertQuerySetEqual(Post.all_objects.alive(), [self.post])  # type: ignore

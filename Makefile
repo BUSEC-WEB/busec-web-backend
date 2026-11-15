@@ -1,18 +1,15 @@
-.PHONY: run test coverage pytest lint migrate seed
+.PHONY: run test coverage lint migrate seed
 
 run:
 	poetry run python manage.py runserver
 
-# no tests exist yet.
+# Runs every test (pytest style and Django TestCase); settings come from pyproject.toml.
 test:
-	poetry run python manage.py test
+	poetry run pytest
 
 coverage:
-	poetry run coverage run manage.py test
+	poetry run coverage run -m pytest
 	poetry run coverage report
-
-pytest:
-	poetry run pytest --ds=config.settings
 
 # NOTE: run this command before pushing any code.
 lint:

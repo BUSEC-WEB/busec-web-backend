@@ -7,14 +7,19 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 
+from features.accounts.factories import (
+    ExecutiveFactory,
+    JournalistFactory,
+    SiteAdminFactory,
+)
 from features.accounts.models import User
+from features.content.factories import PostFactory
 from features.content.models import Post
 from shared.permissions import (
     IsAuthorOrExecutive,
     IsExecutive,
     IsJournalistOrExecutive,
 )
-from shared.tests.factories import make_post, make_user
 
 VIEW = APIView()
 
@@ -34,9 +39,9 @@ class RolePermissionTests(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.executive = make_user("executive", User.Role.EXECUTIVE)
-        cls.journalist = make_user("journalist", User.Role.JOURNALIST)
-        cls.site_admin = make_user("site_admin", User.Role.SITE_ADMIN)
+        cls.executive = ExecutiveFactory.create()
+        cls.journalist = JournalistFactory.create()
+        cls.site_admin = SiteAdminFactory.create()
 
     def assert_allowed(self, permission: Any, user: Any, expected: bool) -> None:
         self.assertIs(permission.has_permission(request_as(user), VIEW), expected)
@@ -71,11 +76,11 @@ class IsAuthorOrExecutiveObjectTests(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
-        cls.author = make_user("author", User.Role.JOURNALIST)
-        cls.other_journalist = make_user("other", User.Role.JOURNALIST)
-        cls.executive = make_user("executive", User.Role.EXECUTIVE)
-        cls.site_admin = make_user("site_admin", User.Role.SITE_ADMIN)
-        cls.post = make_post(cls.author)
+        cls.author = JournalistFactory.create()
+        cls.other_journalist = JournalistFactory.create()
+        cls.executive = ExecutiveFactory.create()
+        cls.site_admin = SiteAdminFactory.create()
+        cls.post = PostFactory.create(author=cls.author)
 
     def assert_allowed(self, user: Any, obj: Any, expected: bool) -> None:
         permission = IsAuthorOrExecutive()

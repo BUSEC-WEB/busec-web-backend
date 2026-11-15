@@ -41,6 +41,10 @@ dev = [
     "django-stubs (>=6.1.2,<7.0.0)",
 ]
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py"]
+
 [tool.coverage.run]
 source = ["."]
 omit = [
