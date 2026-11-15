@@ -1,8 +1,7 @@
 from collections.abc import Iterable
-from datetime import datetime
 from typing import Any, Self, TypeVar
 
-from django.db.models import Model, DateTimeField, QuerySet, Manager
+from django.db.models import DateTimeField, Manager, Model, QuerySet
 from django.utils import timezone
 
 _M = TypeVar("_M", bound=Model)
@@ -11,10 +10,8 @@ _M = TypeVar("_M", bound=Model)
 class TimeStampedModel(Model):
     """Adds `created_at` and `updated_at`, maintained automatically."""
 
-    created_at: DateTimeField[datetime] = DateTimeField(
-        auto_now_add=True, editable=False
-    )
-    updated_at: DateTimeField[datetime] = DateTimeField(auto_now=True, editable=False)
+    created_at = DateTimeField(auto_now_add=True, editable=False)
+    updated_at = DateTimeField(auto_now=True, editable=False)
 
     class Meta:
         abstract = True
@@ -55,9 +52,7 @@ class SoftDeleteModel(Model):
     `objects` excludes soft-deleted rows; `all_objects` sees everything.
     """
 
-    deleted_at: DateTimeField[datetime | None] = DateTimeField(
-        null=True, blank=True, editable=False, db_index=True
-    )
+    deleted_at = DateTimeField(null=True, blank=True, editable=False, db_index=True)
 
     objects = SoftDeleteManager()  # pyright: ignore[reportUnknownVariableType]
     all_objects = SoftDeleteQuerySet.as_manager()  # type: ignore
