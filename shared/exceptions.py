@@ -71,11 +71,18 @@ def _problem(exc: exceptions.APIException, status_code: int) -> dict[str, Any]:
             "errors": _field_errors(exc.detail),
         }
     return {
-        "type": exc.default_code,
+        "type": _code(exc),
         "title": _message(exc.detail),
         "status": status_code,
         "errors": {},
     }
+
+
+def _code(exc: exceptions.APIException) -> str:
+    """Prioritize the specific error code from the raise call (e.g., "no_active_account")
+    over the default exception code ("authentication_failed")."""
+    codes = exc.get_codes()
+    return codes if isinstance(codes, str) else exc.default_code
 
 
 def _field_errors(detail: Any) -> dict[str, Any]:

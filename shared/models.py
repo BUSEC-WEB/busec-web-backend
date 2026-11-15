@@ -41,9 +41,7 @@ class SoftDeleteManager(Manager[_M]):
     """Default manager: soft-deleted rows are invisible unless asked for."""
 
     def get_queryset(self) -> SoftDeleteQuerySet[_M]:
-        return SoftDeleteQuerySet(
-            self.model, using=self._db
-        ).alive()  # pyright: ignore[reportUnknownVariableType]
+        return SoftDeleteQuerySet(self.model, using=self._db).alive()  # pyright: ignore[reportUnknownVariableType]
 
 
 class SoftDeleteModel(Model):
