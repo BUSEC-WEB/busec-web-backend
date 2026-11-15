@@ -1,5 +1,21 @@
-from django.db import models  # noqa: F401
+from django.db import models
+
+from shared.models import TimeStampedModel
 
 # PRD requirements for this slice:
 # - Issue: title, cover, issue date, short description, PDF file (§5.3)
 # - Archive listing of past issues; PDF download fallback (§5.3)
+
+
+class MagazineIssue(TimeStampedModel):
+    title = models.CharField(max_length=255)
+    cover = models.FileField(upload_to="magazine/covers/")
+    issue_date = models.DateField()
+    description = models.TextField(blank=True)
+    pdf = models.FileField(upload_to="magazine/pdfs/")
+
+    class Meta(TimeStampedModel.Meta):
+        ordering = ("-issue_date",)
+
+    def __str__(self) -> str:
+        return self.title

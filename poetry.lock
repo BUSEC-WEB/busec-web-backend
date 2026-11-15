@@ -359,6 +359,21 @@ django = "*"
 typing-extensions = "*"
 
 [[package]]
+name = "django-types"
+version = "0.24.0"
+description = "Type stubs for Django"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "django_types-0.24.0-py3-none-any.whl", hash = "sha256:ddb478ca733e0dde5475118dd59ab340156980f9659fd92de2083326ae96100a"},
+    {file = "django_types-0.24.0.tar.gz", hash = "sha256:af903de8b9ee963b7594459a7a20cb8eaaab176ae2b3244ecaa089e0c570b0d1"},
+]
+
+[package.dependencies]
+types-psycopg2 = ">=2.9.21.13"
+
+[[package]]
 name = "djangorestframework"
 version = "3.18.3"
 description = "Web APIs for Django, made easy."
@@ -1496,6 +1511,18 @@ dev = ["build"]
 doc = ["furo", "sphinx"]
 
 [[package]]
+name = "types-psycopg2"
+version = "2.9.21.20261030"
+description = "Typing stubs for psycopg2"
+optional = false
+python-versions = ">=3.10"
+groups = ["dev"]
+files = [
+    {file = "types_psycopg2-2.9.21.20261030-py3-none-any.whl", hash = "sha256:e51ed54722bc7bc3cfb635a8623d9915d1816ed789c926c40b5f61d5f417a4ab"},
+    {file = "types_psycopg2-2.9.21.20261030.tar.gz", hash = "sha256:7850716d731d6bf45c53f2d26179e2bcf7273d1d3acfd56b0201adc1dec4ba20"},
+]
+
+[[package]]
 name = "types-pyyaml"
 version = "6.0.12.20261103"
 description = "Typing stubs for PyYAML"
@@ -1562,4 +1589,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "28669a80185102f6a906a893f4f1b9cbaf36aa7ee9395b959151b5d670ef4d52"
+content-hash = "7cbd0cea7caf3565a10aa5883c90249cc4af7058badd39d65b403794299d9b7a"
