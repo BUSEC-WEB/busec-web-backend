@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +45,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "django_filters",
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
+    "shared",
     "features.accounts",
     "features.content",
     "features.magazine",
@@ -131,6 +134,42 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
+# File storage
+# https://docs.djangoproject.com/en/6.1/ref/settings/#storages
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+#
+# Uploads go to S3-compatible buckets (MinIO in dev). Models pick a bucket by alias
+# with shared.storage.StorageAlias, so bucket names never end up in migrations.
+
+S3_BACKEND = "storages.backends.s3.S3Storage"
+
+STORAGES: dict[str, dict[str, Any]] = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    "magazine_pdfs": {
+        "BACKEND": S3_BACKEND,
+        "OPTIONS": {"bucket_name": settings.S3_MAGAZINE_BUCKET},
+    },
+    "cover_images": {
+        "BACKEND": S3_BACKEND,
+        "OPTIONS": {"bucket_name": settings.S3_COVER_IMAGE_BUCKET},
+    },
+}
+
+# Connection shared by every S3 bucket above.
+AWS_S3_ENDPOINT_URL = (
+    f"{'https' if settings.S3_SECURE else 'http'}://{settings.S3_ENDPOINT}"
+)
+AWS_ACCESS_KEY_ID = settings.S3_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY = settings.S3_SECRET_KEY
+AWS_S3_ADDRESSING_STYLE = "path"  # bucket in the path; MinIO and most providers
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_DEFAULT_ACL = None  # objects inherit the bucket's (private) policy
+AWS_QUERYSTRING_AUTH = True  # file URLs are signed...
+AWS_QUERYSTRING_EXPIRE = 3600  # ...and expire after an hour
+AWS_S3_FILE_OVERWRITE = False  # a same-named upload gets a new name, never replaces
+
+
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
@@ -141,11 +180,24 @@ MAILERS = {
 }
 
 REST_FRAMEWORK: dict[str, Any] = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    # Secure by default: public (reader) endpoints should opt out explicitly.
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 20,
+    "DEFAULT_PAGINATION_CLASS": "shared.pagination.StandardPagination",
     "DEFAULT_THROTTLE_RATES": {"newsletter": "5/hour"},
+    "EXCEPTION_HANDLER": "shared.exceptions.problem_details_exception_handler",
+}
+
+SIMPLE_JWT: dict[str, Any] = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 CORS_ALLOWED_ORIGINS = settings.CORS_ALLOWED_ORIGINS
@@ -154,3 +206,19 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "BUSEC Web API",
     "VERSION": "0.1.0",
 }
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10mb
+
+
+# Production security
+# https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+
+if settings.SECURE_MODE:
+    # TLS is terminated by the proxy, which forwards the original scheme.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False

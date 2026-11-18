@@ -2,7 +2,7 @@
 
 Always state assumptions and list what was changed in a short summary.
 Ask feedback questions always when a concept/implementation in the code seems vague, never invent new concepts in the code-base on your won.
-Commit small and often always max files in a commit is 16.
+Commit small and often always, max files in a commit is 16.
 Never commit .env yourself or print secrets.
 Work only on the assigned task, on its own branch, never on main branch.
 Touch only the listed files and folders. Ask first if you need more.
@@ -11,3 +11,4 @@ Never edit tests, CI config, AGENTS.md or merged migrations.
 Never “fix” a failing test by changing the assertion. Report the failure instead.
 No destructive commands (rm -rf, git reset --hard, git push --force, DROP TABLE) and no --no-verify.
 Reference the PRD of the application at 'BUSEC Blog PRD.md' and focus on the backend aspects in the document.
+Don't invent concepts in this codebase, ask if anything is vague, unclear, requires predefined code/config so I give decisions on how to go about things.
