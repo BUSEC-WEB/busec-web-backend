@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from shared.models import SoftDeleteModel, TimeStampedModel
+from shared.storage import StorageAlias
 
 # PRD requirements for this slice:
 # - Types: article, poem, literature (§5.1), one Post model with a `type` field
@@ -29,7 +30,9 @@ class Post(TimeStampedModel, SoftDeleteModel):
     title = models.CharField(max_length=255)
     author_byline = models.CharField(max_length=255)
     category = models.CharField(max_length=100, blank=True)
-    cover_image = models.FileField(upload_to="posts/covers/", blank=True)
+    cover_image = models.FileField(
+        upload_to="posts/covers/", blank=True, storage=StorageAlias("cover_images")
+    )
     image_credit = models.CharField(max_length=255, blank=True)
     body = models.TextField()
     status = models.CharField(

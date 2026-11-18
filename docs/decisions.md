@@ -100,3 +100,28 @@ ADR - Alternative Dispute Resolution.
 - Every endpoint requires a signed-in user by default. Public reader endpoints opt out with `permission_classes = [AllowAny]`.
 - A stolen access token works for at most 15 minutes. A refresh token is useless after logout or rotation.
 - The frontend refreshes the access token before it expires and calls `me/` to tailor the UI to the user's role.
+
+## ADR-007: S3-compatible object storage for uploads
+
+**Status:** Accepted. The production provider is still to be chosen.
+
+**Context.** The PRD says media should live in a managed service, not on the server (PRD §7), and notes that large e-magazine PDFs may need separate file storage (PRD §9). Hosting free tiers often have temporary disks that are wiped on redeploy.
+
+**Decision.** Uploads go to S3-compatible buckets through `django-storages` (`storages.backends.s3.S3Storage`). In dev that is a MinIO container; in production it is any S3-compatible provider.
+
+- Two buckets, each a named entry in `settings.STORAGES`:
+  - `magazine_pdfs` (`S3_MAGAZINE_BUCKET`): `MagazineIssue.pdf`.
+  - `cover_images` (`S3_COVER_IMAGE_BUCKET`): `MagazineIssue.cover` and `Post.cover_image`.
+- One connection for all buckets, from `S3_ENDPOINT`, `S3_SECURE`, `S3_ACCESS_KEY` and `S3_SECRET_KEY` (validated in `shared/env.py`).
+- Model fields choose a bucket by alias: `FileField(storage=StorageAlias("magazine_pdfs"))` from `shared/storage.py`.
+- Buckets are private. File URLs are signed and expire after an hour.
+- An upload with an existing name gets a new name; files are never silently replaced.
+
+**Consequences.**
+
+- Switching from MinIO to a production provider changes only env values, not code or migrations: migrations record the alias, never the bucket name or credentials.
+- Any slice can store files by adding an alias to `STORAGES` and using `StorageAlias`. It doesn't need its own storage code.
+- Buckets are infrastructure. They're created once in the MinIO console or the provider's dashboard; the app never creates them, and uploads fail until they exist.
+- Every environment, CI included, must set the `S3_*` variables. CI uses placeholders because tests never contact storage.
+- A signed URL stops working after an hour, so clients ask the API for a fresh one instead of storing it.
+- Image compression and resizing (PRD §6, mobile first) are not handled by plain S3 storage. A later decision covers them if needed.

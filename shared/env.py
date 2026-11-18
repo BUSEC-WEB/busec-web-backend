@@ -24,5 +24,13 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: list[str] = []
     CORS_ALLOWED_ORIGINS: list[str] = []
 
+    # S3-compatible object storage (MinIO in dev, any S3 provider in production).
+    S3_ENDPOINT: str = Field(default=...)
+    S3_SECURE: bool = True
+    S3_ACCESS_KEY: str = Field(default=...)
+    S3_SECRET_KEY: str = Field(default=...)
+    S3_MAGAZINE_BUCKET: str = Field(default=...)
+    S3_COVER_IMAGE_BUCKET: str = Field(default=...)
+
 
 settings = Settings()

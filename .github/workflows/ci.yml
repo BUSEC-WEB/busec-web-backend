@@ -18,6 +18,12 @@ env:
   DATABASE_CONNECTION_STRING: postgresql://developer:AH1W4MYUWxQ9xBXu@localhost:5432/postgres
   DEBUG: True
   SECRET_KEY: 2f7784f9ecbb658c1c85cd7a674ee08891f722e9079cac8d364001c0a2c702ca424a43922fbd3c3b2612d4e5d91ec69b3180860473a1eab9ec212fc2ae809a1a
+  S3_ENDPOINT: localhost:9000
+  S3_SECURE: false
+  S3_ACCESS_KEY: ci-access-key
+  S3_SECRET_KEY: ci-secret-key
+  S3_MAGAZINE_BUCKET: ci-magazine
+  S3_COVER_IMAGE_BUCKET: ci-cover-images
 
 jobs:
   static-analysis:
@@ -78,6 +84,12 @@ jobs:
       DATABASE_CONNECTION_STRING: postgresql://developer:AH1W4MYUWxQ9xBXu@localhost:5432/postgres
       DEBUG: True
       SECRET_KEY: 2f7784f9ecbb658c1c85cd7a674ee08891f722e9079cac8d364001c0a2c702ca424a43922fbd3c3b2612d4e5d91ec69b3180860473a1eab9ec212fc2ae809a1a
+      S3_ENDPOINT: localhost:9000
+      S3_SECURE: false
+      S3_ACCESS_KEY: ci-access-key
+      S3_SECRET_KEY: ci-secret-key
+      S3_MAGAZINE_BUCKET: ci-magazine
+      S3_COVER_IMAGE_BUCKET: ci-cover-images
 
     steps:
       - name: Check out repository

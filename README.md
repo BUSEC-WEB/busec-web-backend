@@ -37,6 +37,13 @@ Read and validated in `shared/env.py` (the app fails at startup if one is invali
 | `ALLOWED_HOSTS` | Allowed host names |
 | `CORS_ALLOWED_ORIGINS` | Origins allowed by CORS |
 | `SECURE_MODE` | `true` in production: HTTPS redirect, secure cookies, HSTS (default `false`) |
+| `S3_ENDPOINT` | S3-compatible storage host and port, no scheme (MinIO in dev, e.g. `localhost:9000`) |
+| `S3_SECURE` | `true` to connect over HTTPS (default `true`) |
+| `S3_ACCESS_KEY` / `S3_SECRET_KEY` | Storage credentials |
+| `S3_MAGAZINE_BUCKET` | Bucket for e-magazine PDFs |
+| `S3_COVER_IMAGE_BUCKET` | Bucket for cover images |
+
+Uploads go to these buckets through django-storages; the buckets must already exist. A model field picks a bucket by its `STORAGES` alias with `shared.storage.StorageAlias("magazine_pdfs")`. File URLs are signed and expire after an hour.
 
 Never commit `.env`.
 
