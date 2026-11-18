@@ -42,11 +42,10 @@
 ## Checklist
 
 - [ ] Branch is not `main` nor `development`, and only the files and folders for this task were touched
-- [ ] `poetry run ruff check .` passes
-- [ ] `poetry run ruff format --check .` passes
-- [ ] `poetry run mypy .` passes
-- [ ] `poetry run python manage.py makemigrations --check --dry-run` reports no changes
-- [ ] Tests added or updated where applicable, and `coverage` meets the 85% threshold
-- [ ] OpenAPI schema / Swagger still renders correctly
-- [ ] Documentation updated if needed (README, PRD references)
+- [ ] `make lint` passes (ruff check, ruff format, mypy)
+- [ ] Tests added or updated in `features/<slice>/tests/`, and `make coverage` passes (70% threshold)
+- [ ] Migrations included for every model change, and `poetry run python manage.py makemigrations --check --dry-run` reports no changes
+- [ ] API schema still valid: `poetry run python manage.py spectacular --validate --fail-on-warn --file /dev/null` passes and `/api/docs/` renders
+- [ ] Docs updated if needed (README, `docs/decisions.md` for a new or changed decision)
+- [ ] Slice rules kept: imports only from the slice itself, `shared/` and `features/accounts`; status changes only via action endpoints
 - [ ] No secrets or `.env` committed, and no new warnings introduced

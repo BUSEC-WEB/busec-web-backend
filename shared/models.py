@@ -10,8 +10,8 @@ _M = TypeVar("_M", bound=Model)
 class TimeStampedModel(Model):
     """Adds `created_at` and `updated_at`, maintained automatically."""
 
-    created_at = DateTimeField(auto_now_add=True, editable=False)
-    updated_at = DateTimeField(auto_now=True, editable=False)
+    created_at = DateTimeField(auto_now_add=True, editable=False)  # type: ignore
+    updated_at = DateTimeField(auto_now=True, editable=False)  # type: ignore
 
     class Meta:
         abstract = True
@@ -45,12 +45,12 @@ class SoftDeleteManager(Manager[_M]):
 
 
 class SoftDeleteModel(Model):
-    """Rows are hidden instead of removed, so they can be restored (PRD §5.2).
+    """Rows are hidden instead of removed, so they can be restored.
 
     `objects` excludes soft-deleted rows; `all_objects` sees everything.
     """
 
-    deleted_at = DateTimeField(null=True, blank=True, editable=False, db_index=True)
+    deleted_at = DateTimeField(null=True, blank=True, editable=False, db_index=True)  # type: ignore
 
     objects = SoftDeleteManager()  # pyright: ignore[reportUnknownVariableType]
     all_objects = SoftDeleteQuerySet.as_manager()  # type: ignore

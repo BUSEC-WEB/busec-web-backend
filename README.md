@@ -10,16 +10,18 @@ Django + DRF API for the BUSEC blog (see the PRD). Organised as vertical slices:
 
 ## Setup
 
+Needs PostgreSQL running and its URL in `.env`.
+
 ```bash
-cp .env.example .env        # then fill in your values
-poetry install              # installs runtime and dev dependencies
-poetry run python manage.py migrate
-poetry run python manage.py createsuperuser
-poetry run python manage.py runserver
+cp .env.example .env               # then fill in your values
+poetry install                     # runtime and dev dependencies
+make migrate                       # create the database tables
+make seed PASSWORD=<pick-one>      # dev data: test_executive, test_journalist, sample posts
+make run                           # API on http://127.0.0.1:8000
 ```
 
-- Swagger UI: <http://127.0.0.1:8000/api/docs/>
-- Admin: <http://127.0.0.1:8000/admin/>
+- Swagger UI: <http://127.0.0.1:8000/api/docs/> (click **Authorize** and paste an access token from `POST /api/v1/accounts/login/`)
+- Admin: <http://127.0.0.1:8000/admin/> (create an account with `poetry run python manage.py createsuperuser`)
 - Health check: <http://127.0.0.1:8000/api/health/> (for uptime monitoring; returns 503 if the database is down)
 - API schema: <http://127.0.0.1:8000/api/schema/>
 
@@ -34,56 +36,83 @@ Read and validated in `shared/env.py` (the app fails at startup if one is invali
 | `SECRET_KEY` | Django secret key |
 | `ALLOWED_HOSTS` | Allowed host names |
 | `CORS_ALLOWED_ORIGINS` | Origins allowed by CORS |
+| `SECURE_MODE` | `true` in production: HTTPS redirect, secure cookies, HSTS (default `false`) |
 
 Never commit `.env`.
 
-## Checks
-
-CI (`.github/workflows/ci.yml`) runs these on pushes and pull requests to `development`, `main` and `dev-onuchukwu`. Run them locally before pushing:
+## Tests and checks
 
 ```bash
-poetry run ruff check .
-poetry run ruff format --check .
-poetry run mypy .                                    # django-stubs plugin, settings: config.settings
-poetry run python manage.py makemigrations --check --dry-run
-poetry run coverage run manage.py test && poetry run coverage report   # fails under 85%
+make test        # every test, with pytest
+make coverage    # tests plus coverage report (fails under 70%)
+make lint        # ruff fix + format, then mypy; run before pushing
+poetry run python manage.py makemigrations --check --dry-run   # no missing migrations
 ```
+
+CI (`.github/workflows/ci.yml`) runs ruff, mypy, the migrations check and the tests with coverage on pushes and pull requests to `development` and `dev-onuchukwu`.
+
+Tests use pytest. Shared fixtures live in the root `conftest.py`: `api_client`, `journalist`, `executive`, and `auth_client(user)` (a client signed in with a real JWT). Each slice builds test data with factory-boy factories in its `factories.py`.
 
 Migrations are excluded from ruff formatting and from the `RUF012` rule. Don't edit merged migrations.
 
 ## Layout
 
 ``` text
-config/         settings and root urls
-shared/
-  env.py        reads and validates .env (add new env keys here)
-  views.py      health check view (database check, cached for 5 seconds)
-  serializers.py
+config/           settings and root urls
+conftest.py       pytest fixtures shared by every slice
+docs/
+  decisions.md    architecture decisions (ADRs)
+shared/           core building blocks, used by every slice
+  env.py          reads and validates .env (add new env keys here)
+  models.py       TimeStampedModel, SoftDeleteModel
+  permissions.py  IsExecutive, IsJournalistOrExecutive, IsAuthorOrExecutive
+  exceptions.py   one error format; InvalidTransition (409)
+  pagination.py   StandardPagination
+  views.py        health check (database check, cached for 5 seconds)
+  management/     DevelopmentCommand base (DEBUG-only commands)
 features/
-  accounts/     staff users and roles (journalist, executive, site_admin)
-  content/      articles, poems, literature
-  magazine/     e-magazine issues
-  committee/    committee members by tenure year
-  newsletter/   subscriber signup
+  accounts/       staff users, roles, JWT auth
+  content/        articles, poems, literature, editorial workflow
+  magazine/       e-magazine issues
+  committee/      committee members by tenure year
+  newsletter/     subscriber signup
 ```
 
-Each slice has `models.py`, `serializers.py`, `views.py` and `urls.py`. The PRD requirements for a slice are listed at the top of its `models.py`.
+The reasons behind the structure are in [docs/decisions.md](docs/decisions.md).
+
+## Slice folder convention
+
+Every slice in `features/<slice>/` uses the same files. Create a file when you need it.
+
+``` text
+features/<slice>/
+  models.py        data, plus behaviour that belongs to a single row
+  services.py      business rules and state changes (e.g. submit, publish); no HTTP
+  serializers.py   request validation and response shape; status fields are read-only
+  views.py         thin: permissions, call a service, return a response
+  permissions.py   rules specific to this slice, built on shared/permissions.py
+  urls.py          the slice's router, mounted at /api/v1/<slice>/
+  factories.py     factory-boy test data builders
+  management/      slice-owned management commands
+  migrations/
+  tests/
+    test_models.py
+    test_services.py
+    test_api.py    endpoints and permissions
+```
+
+A slice imports only from itself, `shared/` and `features/accounts` (see ADR-002). The PRD requirements for a slice are listed at the top of its `models.py`.
 
 ## Working on a slice
 
-1. Write the model in `models.py`, then run `makemigrations <slice>` and `migrate`.
-2. Write the serializer, then the view (`viewsets.ModelViewSet` covers CRUD).
-3. Register viewsets on the `router` in the slice's `urls.py`. It's already mounted at `/api/v1/<slice>/`.
-4. Add tests in `features/<slice>/tests.py` and check the endpoint in Swagger.
+1. Write the model in `models.py`, then run `poetry run python manage.py makemigrations <slice>` and `make migrate`.
+2. Put business rules in `services.py`. Change statuses only there, through action endpoints (ADR-003).
+3. Write the serializer, then the view (`viewsets.ModelViewSet` covers CRUD).
+4. Register viewsets on the `router` in the slice's `urls.py`. It's already mounted at `/api/v1/<slice>/`.
+5. Add tests in `features/<slice>/tests/`. Copy the samples: `features/content/tests/test_models.py`, `test_services.py`, and the `test_me_*` tests in `features/accounts/tests/test_api.py`. Then check the endpoint in Swagger.
 
 Defaults already set in `config/settings.py`: JWT auth, every endpoint requires login unless the view sets `permission_classes = [AllowAny]` (public reader endpoints), pagination (`shared.pagination.StandardPagination`, 20 per page, `?page_size=` up to 100), filtering with `filterset_fields`, CORS origins from `.env`, and a `newsletter` throttle rate (use `throttle_scope = "newsletter"`).
 
-Building blocks in `shared/`:
-
-- `models.py`: `TimeStampedModel`, `SoftDeleteModel` (`objects` hides deleted rows, `all_objects` sees all, `soft_delete()` / `restore()`).
-- `permissions.py`: `IsExecutive`, `IsJournalistOrExecutive`, `IsAuthorOrExecutive`.
-- `exceptions.py`: raise `InvalidTransition(current, target)` for a refused status change (returns 409). Every error uses one format: `{"type", "title", "status", "errors"}` (`application/problem+json`).
+Errors all use one format: `{"type", "title", "status", "errors"}` (`application/problem+json`). Raise `InvalidTransition(current, target)` for a refused status change (returns 409).
 
 Auth (`/api/v1/accounts/`): `login/`, `refresh/`, `logout/` (blacklists the refresh token), `me/`. Send `Authorization: Bearer <access>`.
-
-Dev data: `make seed PASSWORD=<pw>` creates `test_executive` / `test_journalist` and sample posts (DEBUG only).

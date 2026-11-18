@@ -1,8 +1,7 @@
-"""Sample tests for the content slice.
+"""Sample service tests: business rules in services.py, no HTTP involved.
 
-- Model test: behaviour that lives on the model.
-- Service test: business rules in services.py, no HTTP involved.
-(API permission sample: features/accounts/tests.py, `test_me_*`.)
+Copy this pattern for your slice. Model sample: test_models.py.
+API permission sample: features/accounts/tests/test_api.py (`test_me_*`).
 """
 
 from collections.abc import Callable
@@ -15,29 +14,6 @@ from features.content.models import Post
 from shared.exceptions import InvalidTransition
 
 pytestmark = pytest.mark.django_db
-
-
-# Model layer
-
-
-def test_new_post_starts_as_an_unpublished_draft() -> None:
-    post = PostFactory.create()
-
-    assert post.status == Post.Status.DRAFT
-    assert post.publish_date is None
-    assert post.featured is False
-
-
-def test_poem_body_is_stored_verbatim() -> None:
-    body = "First line,\n    indented second\n\nnew stanza"
-
-    post = PostFactory.create(type=Post.Type.POEM, body=body)
-
-    post.refresh_from_db()
-    assert post.body == body
-
-
-# Service layer
 
 
 def test_submit_moves_a_draft_to_review() -> None:
