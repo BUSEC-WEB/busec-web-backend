@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.db import DatabaseError, connection
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema  # type: ignore
 from rest_framework import status as http_status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -29,7 +29,7 @@ class HealthView(APIView):
     """For uptime monitoring (PRD §6). Returns 503 if any integration is down."""
 
     authentication_classes = ()
-    permission_classes = ()
+    permission_classes = ()  # Django REST Framework reads these as APIView configuration, they are not unused.
 
     @extend_schema(
         tags=["health"],

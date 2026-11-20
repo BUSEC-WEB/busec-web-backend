@@ -7,3 +7,4 @@ db.sqlite3
 .ruff_cache
 .pytest_cache
 todo.md
+backlog.md

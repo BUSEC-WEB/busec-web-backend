@@ -1,10 +1,12 @@
-from rest_framework import serializers
+from typing import Any
+
+from rest_framework.serializers import Serializer, CharField, ChoiceField
 
 
-class HealthChecksSerializer(serializers.Serializer):
-    database = serializers.CharField(help_text='"ok" or "error"')
+class HealthChecksSerializer(Serializer[dict[str, Any]]):
+    database = CharField(help_text='"ok" or "error"')
 
 
-class HealthSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=["ok", "error"])
+class HealthSerializer(Serializer[dict[str, Any]]):
+    status = ChoiceField(choices=["ok", "error"])
     checks = HealthChecksSerializer()
